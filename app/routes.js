@@ -36,12 +36,11 @@ module.exports = function(app, passport, db) {
       })
     })
 
+    //Likes
     app.put('/messages', (req, res) => {
       db.collection('messages')
       .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
-        $set: {
-          thumbUp:req.body.thumbUp + 1
-        }
+        $inc: { thumbUp: 1 }
       }, {
         sort: {_id: -1},
         upsert: true
@@ -50,6 +49,20 @@ module.exports = function(app, passport, db) {
         res.send(result)
       })
     })
+    // dislikes
+    app.put('/dislike', (req, res) => {
+      db.collection('messages')
+      .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
+        $inc: { thumbDown: 1 }
+      }, {
+        sort: {_id: -1},
+        upsert: true
+      }, (err, result) => {
+        if (err) return res.send(err)
+        res.send(result)
+      })
+    })
+
 
     app.delete('/messages', (req, res) => {
       db.collection('messages').findOneAndDelete({name: req.body.name, msg: req.body.msg}, (err, result) => {
